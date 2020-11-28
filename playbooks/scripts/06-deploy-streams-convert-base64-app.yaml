@@ -1,0 +1,37 @@
+##############################################################################################
+# Create a simple application which will use Kafka Streams API. This application will        #
+# consume all messages from topic X, convert them to base64 format and produce them          #
+# to topic Y. Java is preferable for Streams application. Also create a makefile and script, #
+# which will build the application and build an image with the application inside and push it#
+#to the internal Kubernetes registry or to dockerhub/quay.                                   #                                                       #
+##############################################################################################
+---
+- name: Deploying the streams-convert-base64-app
+  hosts: localhost
+  vars_files:
+    - ../config_vars/cluster_vars.yaml
+
+  tasks:
+
+     #############################################################
+     # Deploy the java application (streams-convert-base64-app)  #
+     #############################################################
+    - name: Setting the bootstrap server for kafka cluster namespace
+      shell: |
+        sed -i '' "s/replace/{{kafka_cluster_namespace_var}}/g" {{deploy_streams_convert_base64_app_dir}}/00-streams-convert-base64-app.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+
+    - name: Deploying the "streams-convert-base64-app" for namespace --> {{client_app_namespace}}
+      shell: |
+        kubectl apply -f  {{deploy_streams_convert_base64_app_dir}}/00-streams-convert-base64-app.yaml -n {{ client_app_namespace }}
+      register: deploy_results
+    - debug:
+        var: deploy_results.stdout_lines
+    
+    - name: Reverting the bootstrap server to the next deployment.
+      shell: |
+        sed -i '' "s/{{kafka_cluster_namespace_var}}/replace/g" {{deploy_streams_convert_base64_app_dir}}/00-streams-convert-base64-app.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+

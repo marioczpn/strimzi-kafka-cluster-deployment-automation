@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: streams-convert-base64-app
+  name: streams-convert-base64-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: streams-convert-base64-app
+  template:
+    metadata:
+      labels:
+        app: streams-convert-base64-app
+    spec:
+      containers:
+        - name: streams-convert-base64-app
+          image: quay.io/marioczpn/kafka-streams-convert-base64-app:latest
+          env:
+            - name: BOOTSTRAP_SERVERS_ENVVAR
+              value: ops-cluster-kafka-brokers.ops.svc.cluster.local:9092
+            - name: APPLICATION_ID_ENVVAR
+              value: streams-convert-base64-app
+            - name: CLIENT_ID_ENVVAR
+              value: streams-convert-base64-app-client
+            - name: INPUT_TOPIC_NAME_ENVVAR
+              value: input-topic
+            - name: STREAMS_OUTPUT_TOPIC_NAME_ENVVAR
+              value: streams-output-topic
+              

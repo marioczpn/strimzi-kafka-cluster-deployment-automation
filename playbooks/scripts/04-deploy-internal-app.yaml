@@ -1,0 +1,120 @@
+###############################################################################################################################
+# -> Create a script (or modify script from previous steps) which will install Strimzi Operator into a specific namespace     #
+# (based on the script parameter) and deploy Kafka cluster to a specific namespace based on the other parameter of the script.# 
+# The script should be able to deploy Kafka on the same namespace as Operator is installed to and olso into a different one   #
+# (see Strimzi docs how to do that) based on the user's input.                                                                #
+#                                                                                                                             #
+# -> Deploy an example client application, which communicates with Kafka. You can use Strimzi examples for that step.         #
+# The clients should be deployed into different namespace than Kafka and it should use internal Kubernetes communication (no  #
+# need to use external listeners in Kafka). The deployment steps should be part of the previous script/scripts.               #                                                       #
+################################################################################################################################
+---
+- name: Setting namespaces and deploy Strimzi operator, Kafka cluster and internal client app.
+  hosts: localhost
+  vars_files:
+    - ../../config_vars/global_vars.yaml
+
+  tasks:
+
+    ########################################
+    # Deploy Kafka Cluster                 #
+    ########################################
+    - name: Setting kafka cluster namespace -> {{ kafka_cluster_namespace_var }} to {{strimzi_kafka_cluster_dir}}/kafka-ephemeral.yaml
+      shell: |
+        sed -i '' "s/replace/{{ kafka_cluster_namespace_var }}/g" {{strimzi_kafka_cluster_dir}}/kafka-ephemeral.yaml
+        exit 0
+      when: kafka_cluster_namespace_var is defined and ansible_system == 'Darwin'
+
+    - name: Deploying the Kafka Cluster {{strimzi_kafka_cluster_dir}}/kafka-ephemeral.yaml for namespace -> {{ kafka_cluster_namespace_var }}
+      shell: |
+        kubectl apply -f  {{strimzi_kafka_cluster_dir}}/kafka-ephemeral.yaml -n  {{ kafka_cluster_namespace_var }}
+      when: kafka_cluster_namespace_var is defined
+      register: deploy_kafka_results
+    - debug:
+        var: deploy_kafka_results.stdout_lines
+
+   # - name: Waiting kafka cluster deployment
+   #   shell: |
+   #     kubectl wait kafka/{{ kafka_cluster_namespace_var }}-kafka-cluster --for=condition=Ready --timeout=300s -n {{ kafka_cluster_namespace_var }}
+   #   register: results
+  #  - debug:
+   #     var: results.stdout_lines
+
+    - name: Verifying if the Kafka Cluster was successfully deployed
+      shell: |
+        kubectl get deployments -n  {{ kafka_cluster_namespace_var }}
+      when: kafka_cluster_namespace_var is defined
+      register: check_deployments_results
+    - debug:
+        var: check_deployments_results.stdout_lines
+    
+    # Adding this trick to keep the file ready for the next deployment
+    - name: Updating the namespace of the kafka-ephemeral.yaml
+      shell: |
+        sed -i '' "s/{{ kafka_cluster_namespace_var }}/replace/g" {{strimzi_kafka_cluster_dir}}/kafka-ephemeral.yaml
+        exit 0
+      when: kafka_cluster_namespace_var is defined and ansible_system == 'Darwin'
+    
+    #########################################################################
+    # This section is responsible to create a kafka topic for kafka cluster #
+    #########################################################################
+    - name: Setting kafka cluster namespace
+      shell: |
+        sed -i '' "s/replace/{{ kafka_cluster_namespace_var }}/g" {{kafka_topics_dir}}/*.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+
+    - name: Creating kafka topics 
+      shell: |
+        kubectl apply -f  {{kafka_topics_dir}} -n {{ kafka_cluster_namespace_var }}
+      register: kfk_topic_results
+    - debug:
+        var: kfk_topic_results.stdout_lines
+
+    - name: Verifying if the Kafka Topic was successfully deployed
+      shell: |
+        kubectl get kafkatopic -n {{ kafka_cluster_namespace_var }}
+      register: check_topic_results
+    - debug:
+        var: check_topic_results.stdout_lines
+    
+    - name: Reverting changes of {{strimzi_kafka_cluster_dir}}/*.yaml to next kafka deployment
+      shell: |
+        sed -i '' "s/{{ kafka_cluster_namespace_var }}/replace/g" {{strimzi_kafka_cluster_dir}}/*.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+
+    - name: Reverting changes of {{kafka_topics_dir}}/*.yaml to next topic creation 
+      shell: |
+        sed -i '' "s/{{ kafka_cluster_namespace_var }}/replace/g" {{kafka_topics_dir}}/*.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+
+     #########################################################################
+     # Deploy an example client application, which communicates with Kafka.  #
+    #########################################################################
+    - name: Setting the bootstrap server for kafka cluster namespace
+      shell: |
+        sed -i '' "s/replace/{{kafka_cluster_namespace_var}}/g" {{deploy_internal_app_dir}}/*.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+
+    - name: Deploy the client application using the internal communication for namespace --> {{client_app_namespace}}
+      shell: |
+        kubectl apply -f  {{deploy_internal_app_dir}} -n {{ client_app_namespace }}
+      register: deploy_results
+    - debug:
+        var: deploy_results.stdout_lines
+    
+    - name: Reverting chagnes {{strimzi_kafka_cluster_dir}}/*.yaml to the next deployment
+      shell: |
+        sed -i '' "s/{{kafka_cluster_namespace_var}}/replace/g" {{strimzi_kafka_cluster_dir}}/*.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+
+    - name: Reverting chagnes {{deploy_internal_app_dir}}/*.yaml to the next deployment
+      shell: |
+        sed -i '' "s/{{kafka_cluster_namespace_var}}/replace/g" {{deploy_internal_app_dir}}/*.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+

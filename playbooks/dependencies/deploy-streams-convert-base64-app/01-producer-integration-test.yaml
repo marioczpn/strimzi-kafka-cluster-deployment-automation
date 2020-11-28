@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: producer-kafka-streams-integration-test-app
+  name: producer-kafka-streams-integration-test-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: producer-kafka-streams-integration-test-app
+  template:
+    metadata:
+      labels:
+        app: producer-kafka-streams-integration-test-app
+    spec:
+      containers:
+        - name: producer-kafka-streams-integration-test-app
+          image: quay.io/marioczpn/kafka-streams-integration-test-app:latest
+          env:
+            - name: BOOTSTRAP_SERVERS_ENVVAR
+              value: ops-cluster-kafka-brokers.ops.svc.cluster.local:9092
+            - name: APPLICATION_ID_ENVVAR
+              value: streams-convert-base64-project
+            - name: CLIENT_ID_ENVVAR
+              value: streams-convert-base64-project-client
+            - name: INPUT_TOPIC_NAME_ENVVAR
+              value: input-topic
+            - name: STREAMS_OUTPUT_TOPIC_NAME_ENVVAR
+              value: streams-output-topic
+            - name: KAFKA_ACTION_ENVVAR
+              value: PRODUCER
+            - name: TOPIC_MSG_ENVVAR
+              value: helloIntegrationTest
+              

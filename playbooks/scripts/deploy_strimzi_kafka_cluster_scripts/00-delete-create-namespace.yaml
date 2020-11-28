@@ -1,0 +1,40 @@
+
+################################################################################################################################
+#  NAMESPACE Management                                                                                                                #
+#    -It is responsible to Delete and Create a namespace using 'kubectl' commands                                              #                                               #
+################################################################################################################################
+---
+- name: Setting namespaces and deploy Strimzi operator, Kafka cluster and internal client app.
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - ../../config_vars/global_vars.yaml
+
+  tasks:
+
+    ###############################################################################################
+    #  Delete task:                                                                                
+    #    -It will delete the namespace if the flag to_delete be "yes" otherwise it will be skipped.
+    ################################################################################################ 
+    - name: Removing the namespace -> {{ namespace_var }}
+      shell: kubectl delete namespace {{ namespace_var }} --force --grace-period 0
+      when: namespace_var is defined and to_delete == "yes"
+  
+    ###############################################################################################
+    #  Create task:                                                                                
+    #    -It will create a new namespace 
+    ################################################################################################ 
+    - name: Creating the new namespace -> {{ namespace_var }}
+      shell: |
+        kubectl create namespace {{ namespace_var }}
+      when: namespace_var is defined
+        
+    ###############################################################################################
+    #  Verify task:                                                                                
+    #    -It will create a new namespace 
+    ################################################################################################ 
+    - name: Verifying if the the namespace was created.
+      shell: kubectl get namespaces 
+      register: namespaces_result
+    - debug:
+        var: namespaces_result.stdout_lines

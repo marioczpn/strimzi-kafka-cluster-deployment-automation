@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: internal-app-consumer
+  name: internal-app-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: internal-app-consumer
+  template:
+    metadata:
+      labels:
+        app: internal-app-consumer
+    spec:
+      containers:
+        - name: internal-app-consumer
+          image: strimzi/hello-world-consumer:latest
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: replace-cluster-kafka-brokers.replace.svc.cluster.local:9092
+            - name: TOPIC
+              value: internal-topic
+            - name: GROUP_ID
+              value: internal-app-consumer
+            - name: LOG_LEVEL
+              value: "INFO"
+            - name: MESSAGE_COUNT
+              value: "1000000"

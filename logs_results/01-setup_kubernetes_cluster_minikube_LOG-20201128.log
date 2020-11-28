@@ -1,0 +1,81 @@
+        deployment-strimzi-automation mariocp$ ansible-playbook playbooks/scripts/01-setup_kubernetes_cluster_minikube.yaml 
+        [WARNING]: No inventory was parsed, only implicit localhost is available
+        [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+
+        PLAY [Check Minikube Status, Install and Start Minikube] ***********************************************************************************************************************
+
+        TASK [Gathering Facts] *********************************************************************************************************************************************************
+        ok: [localhost]
+
+        TASK [Check Minikube's status.] ************************************************************************************************************************************************
+        ok: [localhost]
+
+        TASK [debug] *******************************************************************************************************************************************************************
+        ok: [localhost] => {
+            "minikube_status": {
+                "changed": false,
+                "cmd": "minikube status",
+                "delta": "0:00:00.422369",
+                "end": "2020-11-28 10:49:20.187690",
+                "failed": false,
+                "failed_when_result": false,
+                "msg": "non-zero return code",
+                "rc": 85,
+                "start": "2020-11-28 10:49:19.765321",
+                "stderr": "",
+                "stderr_lines": [],
+                "stdout": "* Profile \"minikube\" not found. Run \"minikube profile list\" to view all profiles.\n  - To start a cluster, run: \"minikube start\"",
+                "stdout_lines": [
+                    "* Profile \"minikube\" not found. Run \"minikube profile list\" to view all profiles.",
+                    "  - To start a cluster, run: \"minikube start\""
+                ]
+            }
+        }
+
+        TASK [Set default minikube config] *********************************************************************************************************************************************
+        changed: [localhost]
+
+        TASK [Start Minikube] **********************************************************************************************************************************************************
+        changed: [localhost]
+
+        TASK [debug] *******************************************************************************************************************************************************************
+        ok: [localhost] => {
+            "kube.stdout": "* minikube v1.15.1 on Darwin 11.0.1\n* Automatically selected the docker driver\n* Starting control plane node minikube in cluster minikube\n* Downloading Kubernetes v1.19.4 preload ...\n* Creating docker container (CPUs=2, Memory=4096MB) ...\n* Preparing Kubernetes v1.19.4 on Docker 19.03.13 ...\n* Verifying Kubernetes components...\n* Enabled addons: storage-provisioner, default-storageclass\n* Done! kubectl is now configured to use \"minikube\" cluster and \"default\" namespace by default"
+        }
+
+        TASK [Install minikube on MacOS] ***********************************************************************************************************************************************
+        skipping: [localhost]
+
+        TASK [Delete minikube] *********************************************************************************************************************************************************
+        changed: [localhost]
+
+        TASK [Start Minikube] **********************************************************************************************************************************************************
+        changed: [localhost]
+
+        TASK [debug] *******************************************************************************************************************************************************************
+        ok: [localhost] => {
+            "kube.stdout": "* minikube v1.15.1 on Darwin 11.0.1\n* Automatically selected the docker driver\n* Starting control plane node minikube in cluster minikube\n* Creating docker container (CPUs=2, Memory=4096MB) ...\n* Preparing Kubernetes v1.19.4 on Docker 19.03.13 ...\n* Verifying Kubernetes components...\n* Enabled addons: storage-provisioner, default-storageclass\n* Done! kubectl is now configured to use \"minikube\" cluster and \"default\" namespace by default"
+        }
+
+        TASK [Configuring Docker environment] ******************************************************************************************************************************************
+        changed: [localhost]
+
+        TASK [Checking kubernetes node] ************************************************************************************************************************************************
+        changed: [localhost]
+
+        TASK [Export DOCKER_ORG=marioczpn] *********************************************************************************************************************************************
+        changed: [localhost]
+
+        TASK [Docker login] ************************************************************************************************************************************************************
+        changed: [localhost]
+
+        PLAY RECAP *********************************************************************************************************************************************************************
+        localhost                  : ok=13   changed=8    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+
+        deployment-strimzi-automation mariocp$ minikube status
+        minikube
+        type: Control Plane
+        host: Running
+        kubelet: Running
+        apiserver: Running
+        kubeconfig: Configured

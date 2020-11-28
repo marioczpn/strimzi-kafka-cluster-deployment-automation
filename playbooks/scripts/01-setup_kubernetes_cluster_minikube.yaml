@@ -1,0 +1,65 @@
+####################################################################################################################################
+# -> Create a script which will set up a kubernetes cluster (minikube/kind/k3s/...) or use an existing one for the following steps.#
+####################################################################################################################################
+
+---
+- name: Check Minikube Status, Install and Start Minikube
+  hosts: localhost
+
+  vars:
+    install: false
+    purge: true
+
+  pre_tasks:
+    ###########################################################################################
+    #  Minikube's PRE-Tasks:                                                                  #
+    #   - 1.) Checking the minikube status. The status define if it will be started or not.#
+    #   - 2.) If the minikube was deleted. It will set the environment settings to run.       #
+    ###########################################################################################
+    - name: Check Minikube's status.
+      shell: minikube status
+      register: minikube_status
+      failed_when: 
+        - minikube_status.rc == 0
+        - "'FAILED' in minikube_status.stderr"
+      changed_when: false
+      ignore_errors: true
+    - debug:
+        var: minikube_status
+
+    - name: Set default minikube config
+      shell: |
+        minikube config set c 4
+        minikube config set disk-size 20g
+        minikube config set memory 4096
+      when: purge == true
+
+  tasks:
+    ###########################################################################################
+    #  Minikube's TASK:                                                                       #
+    #    - 1.) Intall minikube on MacOS using brew if doesn't exist.                          #
+    #    - 2.) Delete minikube if the flag purge is true (Defined at he begining).            #
+    #    - 3.) Start minikube if is not running.                                              #
+    #    - 4.) Checking if the Docker is up and running.                                      #
+    #    - 5.) Run a simple kubectl to verify if everything is good.                          #
+    ########################################################################################### 
+    - name: Install minikube on MacOS
+      shell: brew install minikube
+      when: ansible_system == 'Darwin' and install
+    
+    - name: Delete minikube
+      shell: minikube delete
+      when: purge == true
+    
+    - name: Start Minikube 
+      shell: minikube start
+      register: kube
+      when: "not minikube_status.stdout or 'Running' not in minikube_status.stdout"
+    - debug:
+        var: kube.stdout
+
+    - name: Configuring Docker environment
+      shell: eval $(minikube -p minikube docker-env)
+
+    - name: Checking kubernetes node
+      shell: kubectl get nodes

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: internal-app-producer
+  name: internal-app-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: internal-app-producer
+  template:
+    metadata:
+      labels:
+        app: internal-app-producer
+    spec:
+      containers:
+        - name: internal-app-producer
+          image: strimzi/hello-world-producer:latest
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: replace-cluster-kafka-brokers.replace.svc.cluster.local:9092
+            - name: TOPIC
+              value: internal-topic
+            - name: DELAY_MS
+              value: "1000"
+            - name: LOG_LEVEL
+              value: "INFO"
+            - name: MESSAGE_COUNT
+              value: "1000000"
+            - name: MESSAGE
+              value: "Hello World!"
+            - name: PRODUCER_ACKS
+              value: "all"

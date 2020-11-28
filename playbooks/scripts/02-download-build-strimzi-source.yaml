@@ -1,0 +1,72 @@
+#################################################################################################################################
+# -> Create a script (or modify script from previous steps) to build Strimzi project, build it’s images and push them into local#
+# kubernetes container registry (or use dockerhub, quay...)                                                                     #
+#################################################################################################################################
+
+---
+- name: Download and Build Strimzi project into local/remote container registry.
+  hosts: localhost
+  vars_files:
+    - ../config_vars/global_vars.yaml
+    
+  tasks:
+  
+    ###################################################################################
+    #  DIRECTORY's TASK:                                                              #
+    #    -These tasks bellow verifies if directory exits otherwise it will be created.#
+    ###################################################################################  
+    - name: Check directory exists
+      stat:
+        path: "{{ strimzi_source_dir }}"
+      register: directory_details
+
+    - name: Echo if directory already exist
+      debug:
+        msg: "The directory is already exist"
+      when: directory_details.stat.exists
+
+    - name: Create project directory and set its permissions
+      file:
+        path: "{{ strimzi_source_dir }}"
+        state: directory
+        mode: '0755'
+
+    ################################################################################### 
+    #  GIT's TASK:                                                                    #
+    #    - Download code from STRIMZI repository branch 'master' into the folder      #
+    #    created previously.                                                          #
+    ###################################################################################  
+    - name: Checkout Git repository
+      git: 
+        repo: "{{strimzi_git_url}}"
+        dest: "{{ strimzi_source_dir }}"
+        clone: yes
+        version: master
+
+
+    ####################################################################################
+    #  Build's TASK:                                                                    #
+    #    - Build Strimzi project and push them into container registry                 #
+    ####################################################################################  
+    - name: Building Strimzi source and generate image.
+      command: chdir={{ strimzi_source_dir }}  make clean |  make MVN_ARGS='-DskipTests -DskipIT' all
+      register: build_result
+    - debug:
+        var: build_result.stdout_lines
+
+    ####################################################################################
+    #  Remove directory TASK:                                                          #
+    #    - Removing the code cloned into the folder "../source/" created previously    #
+    ####################################################################################  
+    - name: Remove directory
+      file:
+          path: "{{ strimzi_source_dir }}"
+          state: absent
+      failed_when: 
+        - build_result.rc == 0
+        - "'FAILED' in build_result.stderr": 
+
+
+
+
+    

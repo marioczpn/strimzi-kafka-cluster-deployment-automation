@@ -1,0 +1,41 @@
+###############################################################################################
+# Create a script, which will deploy your app and verify it. As a part of the deployment, you #
+# have to attach producer to topic X and consumer to topic Y to verify the streams app        #
+#functionality (you can use Strimzi examples for that).                                       #                                                       #
+###############################################################################################
+---
+- name: Deploying the kafka-integration-test-app
+  hosts: localhost
+  vars_files:
+    - ../config_vars/cluster_vars.yaml
+
+  tasks:
+
+     #############################################################
+     # Deploy the java application (kafka-integration-test-app)  #
+     #############################################################
+    - name: Setting the bootstrap server for kafka cluster namespace
+      shell: |
+        sed -i '' "s/replace/{{kafka_cluster_namespace_var}}/g" {{deploy_streams_convert_base64_app_dir}}/*-integration-test.yaml
+        exit 0
+      register: replace_kafka_cluster
+    - debug:
+        var: replace_kafka_cluster.stdout_lines
+      when: ansible_system == 'Darwin'
+
+    - name: Deploying the "kafka-integration-test-app" for namespace --> {{client_app_namespace}}
+      shell: |
+        kubectl apply -f  {{deploy_streams_convert_base64_app_dir}}/ -n {{ client_app_namespace }}
+      register: deploy_results
+    - debug:
+        var: deploy_results.stdout_lines
+    
+    - name: Reverting the bootstrap server to the next deployment.
+      shell: |
+        sed -i '' "s/{{kafka_cluster_namespace_var}}/replace/g" {{deploy_streams_convert_base64_app_dir}}/*-integration-test.yaml
+        exit 0
+      register: revert_replace_kafka_cluster
+    - debug:
+        var: revert_replace_kafka_cluster.stdout_lines
+      when: ansible_system == 'Darwin'
+

@@ -1,0 +1,99 @@
+
+################################################################################################################################
+#  Strimzi Deploy                                                                                                              #
+#    - It is responsible to deploy the Strimzi Cluster Operator into kubernetes                                                #                                               #
+################################################################################################################################
+---
+- name: Setting namespaces and deploy Strimzi operator, Kafka cluster and internal client app.
+  hosts: localhost
+  vars_files:
+    - ../../config_vars/global_vars.yaml
+
+  tasks:
+
+
+    ###################################################################################################################################
+    #  Modify File - 060-Deployment-strimzi-cluster-operator.yaml                                                                           
+    #    - It will modify the file to add the new container image defined on playbooks/config_vars/global_vars.yaml 
+    #    - Modify the STRIMZI_NAMESPACE value to watch options for a Cluster Operator Deployment 
+    #       * For more information: https://strimzi.io/docs/operators/latest/full/deploying.html#con-cluster-operator-watch-options-str)
+    #    - Verify if the ClusterRoleBindings exists if dont't, it will be created.
+    ####################################################################################################################################
+    - name: Modifying the container image from {{old_container_registry_image}} to {{new_container_registry_image}}
+      shell: |
+        sed -i '' 's|{{old_container_registry_image}}|{{new_container_registry_image}}|g' {{strimzi_install_cluster_operator_dir}}/060-Deployment-strimzi-cluster-operator.yaml
+        exit 0
+      register: modify_results
+      when: ansible_system == 'Darwin'
+    - debug:
+        var: modify_results.stdout_lines
+
+    - name: Modifying the STRIMZI_NAMESPACE value "*" to watch all namespaces for Cluster Operator deployment.
+      shell: |
+        sed -i '' "s/replace/"'"'*'"'"/g" {{strimzi_install_cluster_operator_dir}}/060-Deployment-strimzi-cluster-operator.yaml
+        exit 0
+      when: ansible_system == 'Darwin' and install_cluster_roles is defined and modify_role_binding is not defined
+
+    - name: Verifying if the clusterRoleBindings exists
+      shell: "kubectl get clusterrolebindings -o wide | grep strimzi-cluster-operator-namespaced | cat"
+      register: cluster_role_bind_exists
+
+    - name: Creating ClusterRoleBindings that grant cluster-wide access to all namespaces to the Cluster Operator
+      shell: |
+          kubectl create clusterrolebinding strimzi-cluster-operator-namespaced --clusterrole=strimzi-cluster-operator-namespaced --serviceaccount {{namespace_var}}:strimzi-cluster-operator
+          kubectl create clusterrolebinding strimzi-cluster-operator-entity-operator-delegation --clusterrole=strimzi-entity-operator --serviceaccount {{namespace_var}}:strimzi-cluster-operator
+          kubectl create clusterrolebinding strimzi-cluster-operator-topic-operator-delegation --clusterrole=strimzi-topic-operator --serviceaccount {{namespace_var}}:strimzi-cluster-operator
+      when: install_cluster_roles is defined and namespace_var is defined and modify_role_binding is not defined
+      register: install_cluster_roles
+      ignore_errors: true
+    - debug:
+        var: install_cluster_roles.stdout_lines
+
+    ###################################################################################################################################
+    #  Modify/Deploy the *RoleBinding*.yaml                                                                       
+    #    - It will modify the namespace  of the file to watch the single and multiple namespaces
+    #    - If the flag modify_role_binding is defined, it will be deployed into kubernetes.
+    ####################################################################################################################################
+    - name: Modifying the namespace to {{namespace_var}} of the files  {{strimzi_install_cluster_operator_dir}}/*RoleBinding*.yaml files to watch the single and multiple namespaces.
+      shell: |
+        sed -i '' 's/namespace: .*/namespace: {{ namespace_var}}/' {{strimzi_install_cluster_operator_dir}}/*RoleBinding*.yaml
+        exit 0
+      register: modify_rolebind_results
+      when: ansible_system == 'Darwin' and namespace_var is defined 
+    - debug:
+        var: modify_rolebind_results.stdout_lines
+          
+    - name: Deplying Cluster RoleBinding's files to  {{ namespace_var}} defined on parameter {{modify_role_binding}}
+      shell: |
+        kubectl apply -f  {{strimzi_install_cluster_operator_dir}}/020-RoleBinding-strimzi-cluster-operator.yaml -n {{ namespace_var}}
+        kubectl apply -f  {{strimzi_install_cluster_operator_dir}}/032-RoleBinding-strimzi-cluster-operator-topic-operator-delegation.yaml -n {{ namespace_var}}
+        kubectl apply -f  {{strimzi_install_cluster_operator_dir}}/031-RoleBinding-strimzi-cluster-operator-entity-operator-delegation.yaml -n {{ namespace_var}}
+      when: install_cluster_roles is not defined and namespace_var is defined and modify_role_binding is defined
+      register: apply_role_bind
+    - debug:
+        var: apply_role_bind.stdout_lines
+
+    ###################################################################################################################################
+    #  Deploy Cluster Operator                                                                     
+    #    - It will deploy cluster operator if the namespace_var and deploy_operator to be defined.
+    ####################################################################################################################################
+    - name: Deploying Cluster Operator into "{{ namespace_var }}"
+      shell: |
+        kubectl apply -f  {{strimzi_install_cluster_operator_dir}} -n {{ namespace_var }}
+      when: namespace_var is defined and deploy_operator is defined
+      register: deploy_cluster
+    - debug:
+        var: deploy_cluster.stdout_lines
+   
+    ###################################################################################################################################
+    #  Trick Change ;)Modify 060-Deployment-strimzi-cluster-operator.yaml                                                                       
+    #    - It is reverting the container image of file  060-Deployment-strimzi-cluster-operator.yaml to be ready for the next deployment
+    ####################################################################################################################################
+    - name: Reverting changes from {{new_container_registry_image}} to {{old_container_registry_image}} next deployment 
+      shell: |
+        sed -i '' 's|{{new_container_registry_image}}|{{old_container_registry_image}}|g' {{strimzi_install_cluster_operator_dir}}/060-Deployment-strimzi-cluster-operator.yaml
+        exit 0
+      register: modify_results
+      when: ansible_system == 'Darwin'
+    - debug:
+        var: modify_results.stdout_lines
