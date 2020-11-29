@@ -11,7 +11,7 @@ deploy_streams_convert_base64_app_dir: ../dependencies/deploy-streams-convert-ba
 # Define the container registry variables.
 #
 old_container_registry_image: quay.io/strimzi
-new_container_registry_image: quay.io/strimzi
+new_container_registry_image: quay.io/marioczpn
 
 #
 # Define STRIMZI variables.
