@@ -40,6 +40,8 @@ All **requirements** *have been * **implemented** and for more informations,  ho
  
 ## Results
 
+Running Automation Scripts described above
+
 ![Farmers Market Finder Demo](logs_results/images/Scripts_Executions_Strimzi-Kafka_Deployment_Automation.gif)
 
 
