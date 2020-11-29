@@ -3,6 +3,9 @@
 As the whole project was developed in one week, during free time, it has been tested only on MacOS so far. A week of learning and discoveries.
 
 
+![Deployment Automation_Arch](docs/Deployment_Automation_Arch.jpg)
+
+
 This solution are divided in the three main phases.
 
 
