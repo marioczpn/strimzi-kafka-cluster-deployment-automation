@@ -1,6 +1,4 @@
-# Strimzi Deployment Automation
-
-# Deployment of Strimzi and example application using Kafka Streams API
+# Deployment of Strimzi/Kafka cluster and example application using Kafka Streams API
 
 This solution is splitted in phases:
  
@@ -28,7 +26,7 @@ This solution is splitted in phases:
 
 
 
-## **Requirements**:
+## **Modules**:
 
 All **requirements** *have been * **implemented** and for more informations,  how to run and implementation details are available in the modules bellow:
 
@@ -38,3 +36,10 @@ All **requirements** *have been * **implemented** and for more informations,  ho
  4. [Deploy an example client application, which communicates with kafka](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/04-deploy-example_client-app.md)
  5. [Deploy Java Application which will use Kafka Streams API to consume all messages from topic X, convert to base64 format and produces to Y](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/05-deploy-streams-convert-base64-app.md)
  6. [Deploy Application to verify the kafka-streams-convert-base64 app is converting the messages from topic X to Y](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/06-deploy-integration-test.md)
+ 
+ 
+## Results
+
+![Farmers Market Finder Demo](logs_results/images/Scripts_Executions_Strimzi-Kafka_Deployment_Automation.gif)
+
+
