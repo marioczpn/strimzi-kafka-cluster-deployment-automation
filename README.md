@@ -1,7 +1,9 @@
 # Deployment of Strimzi/Kafka cluster and example application using Kafka Streams API
 
-This solution is splitted in phases:
- 
+This whole project was developed in one week, during free time. A week of learning and discoveries.
+
+This solution are divided in the three main phases.
+
 
  - **Deployment Automation for Strimzi, Kafka cluster and APPs:**
 	 - For this phase was developed an automation using [Ansible](https://docs.ansible.com/ansible/latest/index.html) to set up a
