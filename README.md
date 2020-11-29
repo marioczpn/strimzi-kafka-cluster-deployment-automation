@@ -1,9 +1,19 @@
 # Deployment of Strimzi/Kafka cluster and example application using Kafka Streams API
 
-As the whole project was developed in one week, during free time, it has been tested only on MacOS so far. A week of learning and discoveries.
+
+All **requirements** *have been * **implemented** and for more informations,  how to run and implementation details are available in the modules bellow:
+
+ 1. [Setup kubernetes cluster using minikube](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/01-setup_kubernetes_cluster_minikube.md)
+ 2. [Download/Build the STRIMZI project and push them into container registry](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/02-download-build-strimzi-source.md)
+ 3. [Deploying STRIMZI cluster operator and Kafka cluster into local kubernetes](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/03-deploy-strimzi-kafka-cluster.md)
+ 4. [Deploy an example client application, which communicates with kafka](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/04-deploy-example_client-app.md)
+ 5. [Deploy Java Application which will use Kafka Streams API to consume all messages from topic X, convert to base64 format and produces to Y](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/05-deploy-streams-convert-base64-app.md)
+ 6. [Deploy Application to verify the kafka-streams-convert-base64 app is converting the messages from topic X to Y](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/06-deploy-integration-test.md)
 
 
-![Deployment Automation_Arch](docs/Deployment_Automation_Arch.jpg)
+The solution and how the cited modules' responsibilities are represented by the following diagram: 
+
+![Deployment Automation_Arch](docs/Deployment_Automation_Arch.svg)
 
 
 This solution are divided in the three main phases.
@@ -69,15 +79,6 @@ This solution are divided in the three main phases.
 ![consumer](logs_results/images/04-consumer-kafka-integration-test.png)
 
 
-## **Modules**:
 
-All **requirements** *have been * **implemented** and for more informations,  how to run and implementation details are available in the modules bellow:
-
- 1. [Setup kubernetes cluster using minikube](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/01-setup_kubernetes_cluster_minikube.md)
- 2. [Download/Build the STRIMZI project and push them into container registry](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/02-download-build-strimzi-source.md)
- 3. [Deploying STRIMZI cluster operator and Kafka cluster into local kubernetes](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/03-deploy-strimzi-kafka-cluster.md)
- 4. [Deploy an example client application, which communicates with kafka](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/04-deploy-example_client-app.md)
- 5. [Deploy Java Application which will use Kafka Streams API to consume all messages from topic X, convert to base64 format and produces to Y](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/05-deploy-streams-convert-base64-app.md)
- 6. [Deploy Application to verify the kafka-streams-convert-base64 app is converting the messages from topic X to Y](https://github.com/marioczpn/strimzi-kafka-cluster-deployment-automation/blob/master/06-deploy-integration-test.md)
  
  
