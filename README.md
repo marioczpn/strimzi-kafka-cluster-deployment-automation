@@ -1,11 +1,12 @@
 # Deployment of Strimzi/Kafka cluster and example application using Kafka Streams API
 
-This whole project was developed in one week, during free time. A week of learning and discoveries.
+As the whole project was developed in one week, during free time, it has been tested only on MacOS so far. A week of learning and discoveries.
+
 
 This solution are divided in the three main phases.
 
 
- - **Deployment Automation for Strimzi, Kafka cluster and APPs:**
+ - ## **1.) Deployment Automation for Strimzi, Kafka cluster and APPs:**
 	 - For this phase was developed an automation using [Ansible](https://docs.ansible.com/ansible/latest/index.html) to set up a
    kubernetes cluster in my local.
    
@@ -32,7 +33,7 @@ This solution are divided in the three main phases.
 
 ![consumer](logs_results/images/04-consumer-kafka-integration-test.png)
 
- - **Kafka Streams Application**
+ - ## **2.) Kafka Streams Application**
 	  - Developed deploy **script** for this application
 	  - Developed a **Java application**  to consume all messages from topic X, convert them to base64 format and produce them to topic Y. 
 	 - The [kafka-streams-convert-base64-app](https://github.com/marioczpn/kafka-streams-convert-base64-app) code is available
@@ -46,7 +47,7 @@ This solution are divided in the three main phases.
 ![kafka-streams-convert-base64-app](logs_results/images/02-kafka-streams-convertBase64-running.png)
 
 
- - **Integration Test**
+ - ## **3.) Integration Test**
 	  - Developed deploy **script** for this application
 	 - Developed a Java  **application** to verify the *Kafka Streams Application* is consuming all messages from topic X and converting  them to base64 format and produce them to topic Y. 
 	 - The [kafka-streams-convert-base64-app](https://github.com/marioczpn/kafka-streams-convert-base64-app) code is available
