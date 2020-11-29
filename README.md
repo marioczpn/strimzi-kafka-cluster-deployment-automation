@@ -59,6 +59,7 @@ This solution are divided in the three main phases.
 
  - **Results:**
  
+ The log_results folder has the results of the execution that I did in my computer as working evidence.
  The kafka-integration-test verifying the messages from streams-output-topic and producing to  input-topic.
  
  - Producer to  input-topic.
