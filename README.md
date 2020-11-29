@@ -15,14 +15,21 @@ This solution are divided in the three main phases.
 	
  - **Results:**
 
-Running Automation Scripts to build and deployment into kubernetes
+- Running Automation Scripts to build and deployment into kubernetes
 
 ![Deployment Automation](logs_results/images/Scripts_Executions_Strimzi-Kafka_Deployment_Automation.gif)
 
- - Pods running
+
+
+- Pods running
+ 
+ 
 ![pods_running](logs_results/images/00-pods_running.png)
 
-- Cxample client application, which communicates with Kafka
+
+- Example client application, which communicates with Kafka
+
+
 ![consumer](logs_results/images/04-consumer-kafka-integration-test.png)
 
  - **Kafka Streams Application**
@@ -53,7 +60,7 @@ Running Automation Scripts to build and deployment into kubernetes
  - Producer to  input-topic.
 ![producer](logs_results/images/03-producerkafka-integration-test-.png)
 
-- Consumer from streams-output-topic
+- **Consumer** from **streams-output-topic** and **converting** the message to **base64's format**
 ![consumer](logs_results/images/04-consumer-kafka-integration-test.png)
 
 
