@@ -1,0 +1,59 @@
+###############################################################################################
+# Create a script, which will deploy your app and verify it. As a part of the deployment, you #
+# have to attach producer to topic X and consumer to topic Y to verify the streams app        #
+#functionality (you can use Strimzi examples for that).                                       #                                                       #
+###############################################################################################
+---
+- name: Deploying the kafka-integration-test-app
+  hosts: localhost
+  vars_files:
+    - ../config_vars/global_vars.yaml
+
+  tasks:
+
+     ###############################################################################################
+    #  Create task:                                                                                
+    #    -It will create a new namespace 
+    ################################################################################################ 
+    - name: Creating the new namespace -> {{ kafka_integration_test_app_namespace_var }}
+      shell: |
+        kubectl create namespace {{ kafka_integration_test_app_namespace_var }}
+      ignore_errors: yes
+      when: kafka_integration_test_app_namespace_var is defined
+
+    ############################################################################################################################################ 
+    # These tasks will deploy the application that will attach producer to topic a X and consumer to topic Y to verify the streams app       
+    # functionality.     
+    #                                                                 
+    #    - Modify the file {{deploy_streams_convert_base64_app_dir}}/*-integration-test.yaml to add the kafka bootstrap server.
+    #    - Deploy application
+    #############################################################################################################################################
+    - name: Setting the bootstrap server for kafka cluster namespace
+      shell: |
+        sed -i '' "s/replace/{{kafka_cluster_namespace_var}}/g" {{deploy_streams_convert_base64_app_dir}}/*-integration-test.yaml
+        exit 0
+      register: replace_kafka_cluster
+    - debug:
+        var: replace_kafka_cluster.stdout_lines
+      when: ansible_system == 'Darwin'
+
+    - name: Deploying the "kafka-integration-test-app" for namespace --> {{kafka_integration_test_app_namespace_var}}
+      shell: |
+        kubectl apply -f  {{deploy_streams_convert_base64_app_dir}}/ -n {{kafka_integration_test_app_namespace_var}}
+      register: deploy_results
+    - debug:
+        var: deploy_results.stdout_lines
+    
+     ###################################################################################################################################
+    #  Modify *-integration-test.yaml                                                                     
+    #    - It is reverting the changes to be ready for the next deployment
+    ####################################################################################################################################
+    - name: Reverting the bootstrap server to the next deployment.
+      shell: |
+        sed -i '' "s/{{kafka_cluster_namespace_var}}/replace/g" {{deploy_streams_convert_base64_app_dir}}/*-integration-test.yaml
+        exit 0
+      register: revert_replace_kafka_cluster
+    - debug:
+        var: revert_replace_kafka_cluster.stdout_lines
+      when: ansible_system == 'Darwin'
+

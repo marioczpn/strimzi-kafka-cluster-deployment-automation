@@ -1,0 +1,51 @@
+###############################################################################################################################                                                                                                                     #
+# -> Deploy an example client application, which communicates with Kafka. You can use Strimzi examples for that step.         #
+# The clients should be deployed into different namespace than Kafka and it should use internal Kubernetes communication (no  #
+# need to use external listeners in Kafka). The deployment steps should be part of the previous script/scripts.               #                                                       #
+################################################################################################################################
+---
+- name: Deploying an example client application, which communicates with Kafka
+  hosts: localhost
+
+  vars_files:
+    - ../config_vars/global_vars.yaml
+
+
+  tasks:
+
+     ###############################################################################################
+    #  Create task:                                                                                
+    #    -It will create a new namespace 
+    ################################################################################################ 
+    - name: Creating the new namespace -> {{ client_example_app_namespace_var }}
+      shell: |
+        kubectl create namespace {{ client_example_app_namespace_var }}
+      ignore_errors: yes
+      when: client_example_app_namespace_var is defined
+
+    ###################################################################################################################################
+    #  The Tasks bellow will deploy the Strimzi examples to produce/consume messages to broker. IT is also setting the listener to use
+    # internal kubernetes communication.
+    #                                                                 
+    #    - Modify files placed in ../dependencies/deploy-example-client-app/ to add the namespace sent as parameter.
+    #    - Deploy the example client application
+    ####################################################################################################################################
+    - name: Setting the bootstrap server for kafka cluster namespace
+      shell: |
+        sed -i '' "s/replace/{{kafka_cluster_namespace_var}}/g" {{deploy_example_client_app_dir}}/*.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+
+    - name: Deploying the example client application using the internal communication for namespace --> {{ client_example_app_namespace_var }}
+      shell: |
+        kubectl apply -f  {{deploy_example_client_app_dir}} -n {{ client_example_app_namespace_var }}
+      register: deploy_results
+    - debug:
+        var: deploy_results.stdout_lines
+
+    - name: Reverting cahnges {{deploy_example_client_app_dir}}/*.yaml to the next deployment
+      shell: |
+        sed -i '' "s/{{kafka_cluster_namespace_var}}/replace/g" {{deploy_example_client_app_dir}}/*.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+

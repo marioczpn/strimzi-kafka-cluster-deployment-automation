@@ -1,0 +1,28 @@
+strimzi-kafka-cluster-automation mariocp$ ansible-playbook playbooks/scripts/05-deploy-streams-convert-base64-app.yaml -e "kafka_streams_app_namespace_var=app kafka_cluster_namespace_var=ops"
+
+PLAY [Deploying the streams-convert-base64-app which will use Kafka Streams API] ***************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************
+ok: [localhost]
+
+TASK [Setting the bootstrap server to namespace -> app] ****************************************************************************************
+[WARNING]: Consider using the replace, lineinfile or template module rather than running 'sed'.  If you need to use command because replace,
+lineinfile or template is insufficient you can add 'warn: false' to this command task or set 'command_warnings=False' in ansible.cfg to get rid
+of this message.
+changed: [localhost]
+
+TASK [Deploying the "quay.io/marioczpn/kafka-streams-convert-base64-app" to namespace --> app] *************************************************
+changed: [localhost]
+
+TASK [debug] ***********************************************************************************************************************************
+ok: [localhost] => {
+    "deploy_results.stdout_lines": [
+        "deployment.apps/streams-convert-base64-app unchanged"
+    ]
+}
+
+TASK [Reverting the bootstrap server changes to the next deployment.] **************************************************************************
+changed: [localhost]
+
+PLAY RECAP *************************************************************************************************************************************
+localhost                  : ok=5    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   

@@ -52,10 +52,51 @@ Adding a short info about the tasks bellow:
 
 To run use the following command:
 
-    ansible-playbook playbooks/scripts/02-download-build-strimzi-source.yaml
+    ansible-playbook playbooks/scripts/02-download-build-strimzi-source.yaml -e "skip_build=no"
 
-**Results**
+**INFO**: If you want to skip the build just set the extra parameters: skip_build=yes
 
-Adding the execution logs executed from my local:
 
-   
+    ansible-playbook playbooks/scripts/02-download-build-strimzi-source.yaml -e "skip_build=yes"
+
+
+**Results Logs**
+
+I'm adding the execution logs from my local:
+
+    strimzi-kafka-cluster-automation mariocp$  ansible-playbook playbooks/scripts/02-download-build-strimzi-source.yaml -e "skip_build=no"
+    [WARNING]: No inventory was parsed, only implicit localhost is available
+    [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+    
+    PLAY [Download and Build Strimzi project into local/remote container registry.] ****************************************************************
+    
+    TASK [Gathering Facts] *************************************************************************************************************************
+    ok: [localhost]
+    
+    TASK [Check directory exists] ******************************************************************************************************************
+    ok: [localhost]
+    
+    TASK [Echo if directory already exist] *********************************************************************************************************
+    ok: [localhost] => {
+        "msg": "The directory is already exist"
+    }
+    
+    TASK [Create project directory and set its permissions] ****************************************************************************************
+    ok: [localhost]
+    
+    TASK [Checkout Git repository] *****************************************************************************************************************
+    changed: [localhost]
+    
+    TASK [Building Strimzi source and generate image.] *********************************************************************************************
+    skipping: [localhost]
+    
+    TASK [debug] ***********************************************************************************************************************************
+    ok: [localhost] => {
+        "build_result.stdout_lines": "VARIABLE IS NOT DEFINED!"
+    }
+    
+    TASK [Remove directory] ************************************************************************************************************************
+    skipping: [localhost]
+    
+    PLAY RECAP *************************************************************************************************************************************
+    localhost                  : ok=6    changed=1    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0

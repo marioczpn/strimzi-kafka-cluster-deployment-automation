@@ -4,14 +4,14 @@
 strimzi_install_cluster_operator_dir: ../dependencies/install/cluster-operator
 strimzi_kafka_cluster_dir: ../dependencies/kafka
 kafka_topics_dir: ../dependencies/kafka/topics
-deploy_internal_app_dir: ../dependencies/deploy-internal-app
+deploy_example_client_app_dir: ../dependencies/deploy-example-client-app
 deploy_streams_convert_base64_app_dir: ../dependencies/deploy-streams-convert-base64-app
 
 #
 # Define the container registry variables.
 #
 old_container_registry_image: quay.io/strimzi
-new_container_registry_image: quay.io/marioczpn
+new_container_registry_image: quay.io/strimzi
 
 #
 # Define STRIMZI variables.

@@ -60,6 +60,7 @@
 
     - name: Configuring Docker environment
       shell: eval $(minikube -p minikube docker-env)
+      ignore_errors: true
 
     - name: Checking kubernetes node
       shell: kubectl get nodes

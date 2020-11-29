@@ -77,10 +77,10 @@
     #  Deploy Cluster Operator                                                                     
     #    - It will deploy cluster operator if the namespace_var and deploy_operator to be defined.
     ####################################################################################################################################
-    - name: Deploying Cluster Operator into "{{ namespace_var }}"
+    - name: Deploying Cluster Operator into "{{ namespace_var }} and deploy_operator flag is {{deploy_operator}}"
       shell: |
-        kubectl apply -f  {{strimzi_install_cluster_operator_dir}} -n {{ namespace_var }}
-      when: namespace_var is defined and deploy_operator is defined
+        kubectl apply -f  ../{{strimzi_install_cluster_operator_dir}} -n {{ namespace_var }}
+      when: namespace_var is defined and deploy_operator == "yes"
       register: deploy_cluster
     - debug:
         var: deploy_cluster.stdout_lines

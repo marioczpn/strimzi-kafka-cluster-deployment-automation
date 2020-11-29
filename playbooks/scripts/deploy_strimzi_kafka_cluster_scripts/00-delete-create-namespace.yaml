@@ -14,11 +14,11 @@
 
     ###############################################################################################
     #  Delete task:                                                                                
-    #    -It will delete the namespace if the flag to_delete be "yes" otherwise it will be skipped.
+    #    -It will delete the namespace if the flag to_delete_ns be "yes" otherwise it will be skipped.
     ################################################################################################ 
     - name: Removing the namespace -> {{ namespace_var }}
       shell: kubectl delete namespace {{ namespace_var }} --force --grace-period 0
-      when: namespace_var is defined and to_delete == "yes"
+      when: namespace_var is defined and to_delete_ns == "yes"
   
     ###############################################################################################
     #  Create task:                                                                                

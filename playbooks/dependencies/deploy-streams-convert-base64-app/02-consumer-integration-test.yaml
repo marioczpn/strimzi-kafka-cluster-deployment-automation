@@ -19,7 +19,7 @@ spec:
           image: quay.io/marioczpn/kafka-streams-integration-test-app:latest
           env:
             - name: BOOTSTRAP_SERVERS_ENVVAR
-              value: ops-cluster-kafka-brokers.ops.svc.cluster.local:9092
+              value: replace-cluster-kafka-brokers.replace.svc.cluster.local:9092
             - name: APPLICATION_ID_ENVVAR
               value: streams-convert-base64-project
             - name: CLIENT_ID_ENVVAR

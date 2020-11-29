@@ -51,6 +51,7 @@
     - name: Building Strimzi source and generate image.
       command: chdir={{ strimzi_source_dir }}  make clean |  make MVN_ARGS='-DskipTests -DskipIT' all
       register: build_result
+      when: skip_build == "no"
     - debug:
         var: build_result.stdout_lines
 
@@ -62,6 +63,7 @@
       file:
           path: "{{ strimzi_source_dir }}"
           state: absent
+      when: skip_build == "no"
       failed_when: 
         - build_result.rc == 0
         - "'FAILED' in build_result.stderr": 

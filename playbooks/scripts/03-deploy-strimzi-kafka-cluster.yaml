@@ -17,25 +17,25 @@
 # DELETE/CREATE NAMESPACE - It's managing your the namespace
 #   - To be executed it needs operator_namespace,  kafka_cluster_namespace and flag to_delete parameters.
 #
-- import_playbook: deploy_strimzi_kafka_cluster_scripts/00-delete-create-namespace.yaml namespace_var="{{operator_namespace}}" to_delete="{{to_delete}}"
+- import_playbook: deploy_strimzi_kafka_cluster_scripts/00-delete-create-namespace.yaml namespace_var="{{operator_namespace}}" to_delete_ns="{{to_delete_ns}}"
   when: operator_namespace is defined
 
-- import_playbook: deploy_strimzi_kafka_cluster_scripts/00-delete-create-namespace.yaml namespace_var="{{kafka_cluster_namespace}}"
+- import_playbook: deploy_strimzi_kafka_cluster_scripts/00-delete-create-namespace.yaml namespace_var="{{kafka_cluster_namespace}}" to_delete_ns="{{to_delete_ns}}"
   when: kafka_cluster_namespace is defined and kafka_cluster_namespace != operator_namespace and kafka_cluster_namespace != client_app_namespace
 
 #
 # Deploy STRIMZI cluster
 #   - To be executed it needs operator_namespace, kafka_cluster_namespace, install_cluster_roles and  deploy_operator parameters.
 #
-#- import_playbook: deploy_strimzi_kafka_cluster_scripts/01-deploy-strimzi-cluster-operator.yaml namespace_var="{{operator_namespace}}" install_cluster_roles="true" deploy_operator="true" 
- # when: operator_namespace is defined
+- import_playbook: deploy_strimzi_kafka_cluster_scripts/01-deploy-strimzi-cluster-operator.yaml namespace_var="{{operator_namespace}}" install_cluster_roles="yes" deploy_operator="yes" 
+  when: operator_namespace is defined
 
-#- import_playbook: deploy_strimzi_kafka_cluster_scripts/01-deploy-strimzi-cluster-operator.yaml namespace_var="{{kafka_cluster_namespace}}" modify_role_binding="true"
- # when: kafka_cluster_namespace is defined
+- import_playbook: deploy_strimzi_kafka_cluster_scripts/01-deploy-strimzi-cluster-operator.yaml namespace_var="{{kafka_cluster_namespace}}" modify_role_binding="yes" deploy_operator="no" 
+  when: kafka_cluster_namespace is defined
 
 #
 # Deploy Kafka cluster
 #   - To be executed it needs operator_namespace, kafka_cluster_namespace, install_cluster_roles and  deploy_operator parameters.
 #
-#- import_playbook: deploy_strimzi_kafka_cluster_scripts/02-deploy-strimzi-kafka-cluster.yaml kafka_cluster_namespace_var="{{kafka_cluster_namespace}}"
-#  when: kafka_cluster_namespace is defined
+- import_playbook: deploy_strimzi_kafka_cluster_scripts/02-deploy-strimzi-kafka-cluster.yaml kafka_cluster_namespace_var="{{kafka_cluster_namespace}}"
+  when: kafka_cluster_namespace is defined

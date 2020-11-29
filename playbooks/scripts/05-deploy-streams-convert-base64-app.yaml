@@ -1,0 +1,55 @@
+##############################################################################################
+# Create a simple application which will use Kafka Streams API. This application will        #
+# consume all messages from topic X, convert them to base64 format and produce them          #
+# to topic Y. Java is preferable for Streams application. Also create a makefile and script, #
+# which will build the application and build an image with the application inside and push it#
+#to the internal Kubernetes registry or to dockerhub/quay.                                   #                                                       #
+##############################################################################################
+---
+- name: Deploying the streams-convert-base64-app which will use Kafka Streams API
+  hosts: localhost
+  vars_files:
+    - ../config_vars/global_vars.yaml
+
+  tasks:
+
+     ###############################################################################################
+    #  Create task:                                                                                
+    #    -It will create a new namespace 
+    ################################################################################################ 
+    - name: Creating the new namespace -> {{ kafka_streams_app_namespace_var }}
+      shell: |
+        kubectl create namespace {{ kafka_streams_app_namespace_var }}
+      ignore_errors: yes
+      when: kafka_streams_app_namespace_var is defined
+
+    #############################################################################################################################################
+    # These tasks will deploy the application that consumes all messages from topic X, convert them to base64 format and produce them to topic Y.    
+    # and it's also using the internal kubernetes communication.
+    #                                                                 
+    #    - Modify the file 00-streams-convert-base64-app.yaml to add the kafka bootstrap server.
+    #    - Deploy application
+    #############################################################################################################################################
+    - name: Setting the bootstrap server to namespace -> {{kafka_streams_app_namespace_var}}
+      shell: |
+        sed -i '' "s/replace/{{kafka_cluster_namespace_var}}/g" {{deploy_streams_convert_base64_app_dir}}/00-streams-convert-base64-app.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+
+    - name: Deploying the "quay.io/marioczpn/kafka-streams-convert-base64-app" to namespace --> {{kafka_streams_app_namespace_var}}
+      shell: |
+        kubectl apply -f  {{deploy_streams_convert_base64_app_dir}}/00-streams-convert-base64-app.yaml -n {{ kafka_streams_app_namespace_var }}
+      register: deploy_results
+    - debug:
+        var: deploy_results.stdout_lines
+    
+    ###################################################################################################################################
+    #  Modify 00-streams-convert-base64-app.yaml                                                                      
+    #    - It is reverting the changes to be ready for the next deployment
+    ####################################################################################################################################
+    - name: Reverting the bootstrap server changes to the next deployment.
+      shell: |
+        sed -i '' "s/{{kafka_cluster_namespace_var}}/replace/g" {{deploy_streams_convert_base64_app_dir}}/00-streams-convert-base64-app.yaml
+        exit 0
+      when: ansible_system == 'Darwin'
+
