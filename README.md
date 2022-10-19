@@ -1,4 +1,4 @@
-# Deployment of Strimzi/Kafka cluster and example application using Kafka Streams API
+# Deployment of Strimzi/Kafka cluster and example application using Kafka Streams API ![CI/CD Pipelines](https://github.com/marioczpn/kafka-streams-integration-test-app/workflows/CI/CD%20Pipelines/badge.svg)
 
 
 All **requirements** *have been * **implemented** and for more informations,  how to run and implementation details are available in the modules bellow:
